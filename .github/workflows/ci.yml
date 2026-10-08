@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Installs Lean, fetches Mathlib's compiled files, and runs `lake build`;
+      # any warning fails the build.
+      - uses: leanprover/lean-action@v1
+        with:
+          build-args: "--wfail"
+
+      # Every listed theorem must be reported, and no reported axiom may lie outside
+      # propext, Classical.choice and Quot.sound (a theorem that needs fewer passes).
+      - name: Check the axiom ledger
+        run: |
+          lake env lean RegisterRAR/Ledger.lean | tee ledger.txt
+          expected=$(grep -c '^#print axioms' RegisterRAR/Ledger.lean)
+          reported=$(grep -c "^'Register\." ledger.txt)
+          echo "$reported of $expected listed theorems reported"
+          test "$reported" -eq "$expected"
+          if grep -o 'depends on axioms: \[[^]]*\]' ledger.txt \
+              | sed 's/.*\[//; s/\]//' | tr ',' '\n' | tr -d ' ' \
+              | grep -v -E '^(propext|Classical\.choice|Quot\.sound)$'; then
+            echo "an axiom outside the three was used"
+            exit 1
+          fi
+          echo "every reported axiom is one of propext, Classical.choice, Quot.sound"

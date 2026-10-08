@@ -1,0 +1,99 @@
+Register.Relation.radial_acceleration_relation : ∀ (R : Register.Reg) (G : ℝ),
+  G = R.c ^ 3 * R.kB / (4 * R.ℏ * R.η) →
+    ∀ (Λ : ℝ),
+      0 < Λ →
+        R.L * R.ℓc = 2 * R.pi * √(3 / Λ) →
+          ∀ (TdS : ℝ),
+            R.kB * TdS = R.ℏ / (R.L * R.tc) →
+              ∀ (εs : ℝ),
+                εs = R.kB * TdS →
+                  ∀ (M r : ℝ),
+                    0 < M →
+                      0 < r →
+                        ∀ (TN : ℝ),
+                          R.kB * TN = R.ℏ / (R.La (G * M / r ^ 2) * R.tc) →
+                            ∀ (a Ta : ℝ),
+                              0 < a →
+                                R.kB * Ta = R.ℏ / (R.La a * R.tc) →
+                                  ∀ (surv : ℝ → ℝ),
+                                    (∀ (x : ℝ), 0 ≤ x → surv x = Real.exp (-x)) →
+                                      ∀ (b : ℝ),
+                                        b = 1 - surv √(2 * R.kB * TN * R.ln2 / ((1 - R.ln2) * εs)) →
+                                          M * R.c ^ 2 = 2 * (b * R.Ns r) * (R.kB * Ta * R.ln2) →
+                                            a = G * M / r ^ 2 / (1 - Real.exp (-√(G * M / r ^ 2 / R.a0))) ∧
+                                              R.a0 = (1 - R.ln2) * R.c ^ 2 / (2 * R.ln2 * √(3 / Λ)) ∧
+                                                M * R.c ^ 2 = 2 * R.Ns r * (R.kB * TN * R.ln2)
+'Register.Relation.radial_acceleration_relation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Relation.hypotheses_consistent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.exists_loop_not_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.two_mul_card_through' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.card_cell_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.card_cell_eq_two_mul_card_loop' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.counts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.even_L' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.Positions.even_of_halfway' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.Positions.dist_opp' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.Positions.card_ringDist' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.Positions.card_dist_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.Positions.card_dist_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Horizon.Positions.horizon_weight_ring' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Models.fano_counts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Models.fano_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.one_bit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.area_in_cells' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.lap_time' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.quarter_lap' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.T_dS' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.La_lap' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.T_Unruh' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.eta_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.einstein_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.G_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.cell_from_G' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.entropy_quarter' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.hasDerivAt_fSdS' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.gSdS_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.gSdS_mass' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.deSitter' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.Ns_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.radius_from_geodesics' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.newton_komar' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.newton_share' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.vacuum_per_string' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.string_split' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.proper_distance_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.proper_distance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.horizon_period' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.horizon_temperature' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.share_of_equipartition' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.share_acceleration' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.fill_fraction' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.law' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.law_scale_mean' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.near_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.deep_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.classical_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.tully_fisher' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.scale_over_time' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.Hinf_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.κ_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.a0_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.a0_val' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.horizon_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.elastic_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.thermal_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.string_energy_check' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.a0_uncertainty' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.a0_sigmas' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.a0_local_H0' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.tolerance_mean_from_data' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.cH0_coefficients' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.tully_fisher_speeds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.deep_radii' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.solar_system' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.neptune_departure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.rar_table' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.reg_RL' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.reg_a0' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.reg_jacobson' depends on axioms: [propext, Classical.choice, Quot.sound]

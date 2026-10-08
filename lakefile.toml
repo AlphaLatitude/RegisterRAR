@@ -1,0 +1,10 @@
+name = "RegisterRAR"
+defaultTargets = ["RegisterRAR"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "045acef0f761280401116e3801cb78ed1b2e716b"
+
+[[lean_lib]]
+name = "RegisterRAR"
