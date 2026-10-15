@@ -13,7 +13,7 @@ import Mathlib.Algebra.Group.Action.Defs
 # The count of the register (Sec. II)
 
 Formal counterpart of the paragraph of Sec. II of *The Radial Acceleration Relation from the Granularity of Hilbert Space*
-(v0-13) that begins "Postulate 2 fixes how many largest rings there are":
+(v0-18) that begins "Postulate 2 fixes how many largest rings there are":
 
   ρ = L/2 largest rings through every cell,
   C = 2 + ρ(L − 2) = L²/2 − L + 2 cells,

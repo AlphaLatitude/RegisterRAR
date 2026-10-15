@@ -11,7 +11,7 @@ import Mathlib.Tactic.Positivity
 # The horizon counts every largest ring (Sec. II)
 
 Formal counterpart of the paragraph of Sec. II of *The Radial Acceleration Relation from the Granularity of Hilbert Space*
-(v0-13) that begins "Postulate 2 gives every cell a distance from the observer's cell".  The largest
+(v0-18) that begins "Postulate 2 gives every cell a distance from the observer's cell".  The largest
 rings carry their cyclic order: each ring's cells sit at the positions `0, …, L − 1` of `ZMod L`,
 one step per cell (Postulate 1: the shift moves a bit to the next cell), and the opposite of a cell
 lies halfway round, `L/2` steps on (Postulate 2).  Postulate 2 then gives every cell not opposite

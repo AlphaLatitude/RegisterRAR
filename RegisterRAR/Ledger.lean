@@ -34,7 +34,7 @@ is printed first, so that its hypotheses, the inputs the paper claims, can be re
 #print axioms Register.Models.fano_counts
 #print axioms Register.Models.fano_even
 
--- Sec. II, the inputs: one bit, horizon temperatures, Einstein's equations, the horizon, Newton's law, the vacuum (Chain.lean)
+-- Sec. II, the inputs: one bit, horizon temperatures, Einstein's equations, the horizon, Newton's law, the vacuum, a string's energy (Chain.lean)
 #print axioms Register.Reg.one_bit
 #print axioms Register.Reg.area_in_cells
 #print axioms Register.Reg.lap_time
@@ -56,6 +56,7 @@ is printed first, so that its hypotheses, the inputs the paper claims, can be re
 #print axioms Register.Reg.newton_komar
 #print axioms Register.Reg.newton_share
 #print axioms Register.Reg.vacuum_per_string
+#print axioms Register.Reg.string_energy
 #print axioms Register.Reg.string_split
 
 -- Sec. II, the de Sitter horizon: a quarter of a largest ring away, a largest ring's lap as its period (DeSitter.lean)
@@ -64,7 +65,7 @@ is printed first, so that its hypotheses, the inputs the paper claims, can be re
 #print axioms Register.Reg.horizon_period
 #print axioms Register.Reg.horizon_temperature
 
--- Secs. III–VI, the share, what reaches a string, the tolerance, the law and its limits (Law.lean)
+-- Secs. III–VI, the share, what reaches a string, the threshold, the law and its limits (Law.lean)
 #print axioms Register.Law.share_of_equipartition
 #print axioms Register.Reg.share_acceleration
 #print axioms Register.Reg.fill_fraction
@@ -75,7 +76,13 @@ is printed first, so that its hypotheses, the inputs the paper claims, can be re
 #print axioms Register.Law.classical_limit
 #print axioms Register.Law.tully_fisher
 
--- Sec. VIII, the scale and Λ at every epoch (Law.lean)
+-- Sec. VII, two bodies (Law.lean)
+#print axioms Register.Reg.share_reading
+#print axioms Register.Law.two_body_split
+#print axioms Register.Law.two_body_deep
+#print axioms Register.Law.two_body_equal
+
+-- Sec. IX, the scale and Λ at every epoch (Law.lean)
 #print axioms Register.Reg.scale_over_time
 
 -- Every number the paper quotes (Numerics.lean)
@@ -88,10 +95,11 @@ is printed first, so that its hypotheses, the inputs the paper claims, can be re
 #print axioms Register.Numerics.elastic_bound
 #print axioms Register.Numerics.thermal_values
 #print axioms Register.Numerics.string_energy_check
+#print axioms Register.Numerics.vacuum_share
 #print axioms Register.Numerics.a0_uncertainty
 #print axioms Register.Numerics.a0_sigmas
 #print axioms Register.Numerics.a0_local_H0
-#print axioms Register.Numerics.tolerance_mean_from_data
+#print axioms Register.Numerics.threshold_mean_from_data
 #print axioms Register.Numerics.cH0_coefficients
 #print axioms Register.Numerics.tully_fisher_speeds
 #print axioms Register.Numerics.deep_radii

@@ -5,24 +5,30 @@ Register.Relation.radial_acceleration_relation : ∀ (R : Register.Reg) (G : ℝ
         R.L * R.ℓc = 2 * R.pi * √(3 / Λ) →
           ∀ (TdS : ℝ),
             R.kB * TdS = R.ℏ / (R.L * R.tc) →
-              ∀ (εs : ℝ),
-                εs = R.kB * TdS →
-                  ∀ (M r : ℝ),
-                    0 < M →
-                      0 < r →
-                        ∀ (TN : ℝ),
-                          R.kB * TN = R.ℏ / (R.La (G * M / r ^ 2) * R.tc) →
-                            ∀ (a Ta : ℝ),
-                              0 < a →
-                                R.kB * Ta = R.ℏ / (R.La a * R.tc) →
-                                  ∀ (surv : ℝ → ℝ),
-                                    (∀ (x : ℝ), 0 ≤ x → surv x = Real.exp (-x)) →
-                                      ∀ (b : ℝ),
-                                        b = 1 - surv √(2 * R.kB * TN * R.ln2 / ((1 - R.ln2) * εs)) →
-                                          M * R.c ^ 2 = 2 * (b * R.Ns r) * (R.kB * Ta * R.ln2) →
-                                            a = G * M / r ^ 2 / (1 - Real.exp (-√(G * M / r ^ 2 / R.a0))) ∧
-                                              R.a0 = (1 - R.ln2) * R.c ^ 2 / (2 * R.ln2 * √(3 / Λ)) ∧
-                                                M * R.c ^ 2 = 2 * R.Ns r * (R.kB * TN * R.ln2)
+              ∀ (τred εs : ℝ),
+                εs = R.ℏ / τred →
+                  τred = R.L * R.tc →
+                    ∀ (M r : ℝ),
+                      0 < M →
+                        0 < r →
+                          ∀ (TN : ℝ),
+                            R.kB * TN = R.ℏ / (R.La (G * M / r ^ 2) * R.tc) →
+                              ∀ (a Ta : ℝ),
+                                0 < a →
+                                  R.kB * Ta = R.ℏ / (R.La a * R.tc) →
+                                    ∀ (surv : ℝ → ℝ),
+                                      (∀ (x : ℝ), 0 ≤ x → surv x = Real.exp (-x)) →
+                                        ∀ (b : ℝ),
+                                          b = 1 - surv √(2 * R.kB * TN * R.ln2 / ((1 - R.ln2) * εs)) →
+                                            ∀ (Ncar εc κ : ℝ),
+                                              M * R.c ^ 2 = Ncar * εc →
+                                                Ncar = b * R.Ns r →
+                                                  εc = κ * Ta →
+                                                    M * R.c ^ 2 = R.Ns r * (κ * TN) →
+                                                      a = G * M / r ^ 2 / (1 - Real.exp (-√(G * M / r ^ 2 / R.a0))) ∧
+                                                        R.a0 = (1 - R.ln2) * R.c ^ 2 / (2 * R.ln2 * √(3 / Λ)) ∧
+                                                          M * R.c ^ 2 = 2 * R.Ns r * (R.kB * TN * R.ln2) ∧
+                                                            κ = 2 * R.kB * R.ln2
 'Register.Relation.radial_acceleration_relation' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Relation.hypotheses_consistent' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Horizon.exists_loop_not_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -60,6 +66,7 @@ Register.Relation.radial_acceleration_relation : ∀ (R : Register.Reg) (G : ℝ
 'Register.Reg.newton_komar' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Reg.newton_share' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Reg.vacuum_per_string' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.string_energy' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Reg.string_split' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Reg.proper_distance_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Reg.proper_distance' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -74,6 +81,10 @@ Register.Relation.radial_acceleration_relation : ∀ (R : Register.Reg) (G : ℝ
 'Register.Law.deep_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Law.classical_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Law.tully_fisher' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Reg.share_reading' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.two_body_split' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.two_body_deep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Law.two_body_equal' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Reg.scale_over_time' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.Hinf_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.κ_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -84,10 +95,11 @@ Register.Relation.radial_acceleration_relation : ∀ (R : Register.Reg) (G : ℝ
 'Register.Numerics.elastic_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.thermal_values' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.string_energy_check' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.vacuum_share' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.a0_uncertainty' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.a0_sigmas' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.a0_local_H0' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Register.Numerics.tolerance_mean_from_data' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Register.Numerics.threshold_mean_from_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.cH0_coefficients' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.tully_fisher_speeds' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Register.Numerics.deep_radii' depends on axioms: [propext, Classical.choice, Quot.sound]

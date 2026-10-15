@@ -15,7 +15,7 @@ import Mathlib.Analysis.SpecialFunctions.BinaryEntropy
 # Sec. II of the paper: the inputs, derived from the two postulates and thermodynamics
 
 Formal counterpart of Sec. II, "The inputs", of *The Radial Acceleration Relation from the
-Granularity of Hilbert Space* (v0-13).  Every relation that the section derives is a theorem here, with the
+Granularity of Hilbert Space* (v0-18).  Every relation that the section derives is a theorem here, with the
 physical inputs stated as **named hypotheses** of the theorems that use them, so that a theorem's
 statement is its own ledger.  No physical axiom is declared; `Ledger.lean` prints the axioms of
 every main theorem, which are the logical minimum of classical mathematics.
@@ -38,10 +38,19 @@ The paper's own additions are at the end.
 * `hK`, the Komar energy of a static solution: `Mc² = 2T_aS` [Komar 1959; Padmanabhan 2010], a
   classical result of the equations that `hJ` derives.
 * `hGeo`, the closed geodesics: without a mass and with the symmetry of space the solution is
-  maximally symmetric, and of the maximally symmetric vacua only de Sitter space has closed
-  spacelike geodesics, circles of radius `√(3/Λ)` [Hawking–Ellis 1973]; the largest rings are these
-  circles, `Lℓ_c = 2π√(3/Λ)`.  The symmetry of space is the one premise from outside the
-  postulates and thermodynamics, as in the gravitation paper.
+  maximally symmetric, and of the maximally symmetric vacua, taken simply connected, only de Sitter
+  space has closed spacelike geodesics, circles of radius `√(3/Λ)` [Hawking–Ellis 1973].  Its
+  quotients are excluded (Sec. II): closing flat or anti-de Sitter space, or de Sitter space in
+  chosen directions, breaks the symmetry of space; identifying opposite points of space and time
+  leaves no consistent direction of time; identifying opposite points of space alone halves every
+  closed geodesic, against Postulate 2's one opposite.  A largest ring has the length of these
+  circles, `Lℓ_c = 2π√(3/Λ)`.  The symmetry of space is one of the two premises from outside the
+  postulates and thermodynamics; Palmer's relation (`hDP`) is the other.
+* `hDP`, `hClock`, Palmer's relation (Sec. II): Palmer equates a superposition's reduction time
+  with the Diósi–Penrose time `ℏ/E_G`, so the energy that goes with a qubit is `ℏ` over its
+  reduction time (`hDP`); with `L` the same for every qubit, a free string's reduction time is the
+  lap of a largest ring, `Lt_c` (`hClock`).  With `I1` they give a string the energy `k_BT_dS`
+  (`string_energy`).
 
 The solution of Einstein's equations is the classical Schwarzschild–de Sitter solution `fSdS`
 [Kottler 1918], taken as already proven, as in RegisterGravity; with no mass it is de Sitter space.
@@ -311,10 +320,10 @@ theorem Ns_eq (r : ℝ) : R.Ns r = R.pi ^ 2 * r ^ 2 / R.ℓc ^ 2 := by
   field_simp
   ring
 
-/-- **The horizon's radius from the closed geodesics** (Sec. II).  The largest rings are the closed
-geodesics of the solution without a mass, circles of radius `√(3/Λ)` (hypothesis `hGeo`, see the
-module comment).  Then `R_Λ = Lℓ_c/2π = √(3/Λ)`, `Λ = 3/R_Λ²`, and that solution has its horizon at
-`R_Λ`. -/
+/-- **The horizon's radius from the closed geodesics** (Sec. II).  A largest ring has the length of
+a closed geodesic of the solution without a mass, a circle of radius `√(3/Λ)` (hypothesis `hGeo`,
+see the module comment).  Then `R_Λ = Lℓ_c/2π = √(3/Λ)`, `Λ = 3/R_Λ²`, and that solution has its
+horizon at `R_Λ`. -/
 theorem radius_from_geodesics (G Λ : ℝ) (hΛ : 0 < Λ)
     (hGeo : R.L * R.ℓc = 2 * R.pi * Real.sqrt (3 / Λ)) :
     R.RL = Real.sqrt (3 / Λ) ∧ Λ = 3 / R.RL ^ 2 ∧ R.fSdS G 0 Λ R.RL = 0 := by
@@ -331,9 +340,10 @@ theorem radius_from_geodesics (G Λ : ℝ) (hΛ : 0 < Λ)
 
 /-- **Newton's law from the Komar energy** (Sec. II).  A sphere of radius `r` on which the
 acceleration toward the body is `a` has, by `I1`, the Unruh temperature; its entropy is `ηA`, one
-bit for each of its `N_s` strings, `k_B N_s ln 2`; the Komar energy inside it is `Mc² = 2T_aS`
-(`hK`); and Jacobson's `G` is `hJ`.  Then `a = GM/r²`: Newton's law is an equal share of the body's
-energy among the strings of the sphere, two Landauer energies each. -/
+bit for each of its `N_s` strings, `k_B N_s ln 2`; the Komar energy inside it is `Mc² = 2T_aS`,
+with `M` all the mass inside the sphere (`hK`); and Jacobson's `G` is `hJ`.  Then `a = GM/r²`:
+Newton's law is an equal share of the body's energy among the strings of the sphere, two Landauer
+energies each. -/
 theorem newton_komar (G M r a T : ℝ) (hr : 0 < r) (ha : 0 < a)
     (hJ : G = R.c ^ 3 * R.kB / (4 * R.ℏ * R.η))
     (I1 : R.kB * T = R.ℏ / (R.La a * R.tc))
@@ -401,11 +411,20 @@ theorem vacuum_per_string (G Λ T : ℝ) (hJ : G = R.c ^ 3 * R.kB / (4 * R.ℏ *
     field_simp
     ring
 
-/-- **The split of a string's energy** (Sec. II).  Taking a string's energy to be one horizon
-thermal energy, `ε_s = k_BT_dS` (hypothesis `hεs`; Planck's `Ω_Λ` supports it to 1%,
-`Numerics.string_energy_check`), its heat, the horizon's temperature times the string's one bit of
-entropy, is `ln 2` of it and equals the vacuum's share per string (`vacuum_per_string`), and the
-rest, `(1 − ln 2)ε_s`, is matter. -/
+/-- **A string's energy from Palmer's relation** (Sec. II).  Palmer equates a superposition's
+reduction time with the Diósi–Penrose time `ℏ/E_G`, so the energy that goes with a qubit is `ℏ`
+over its reduction time (`hDP`).  With `L` the same for every qubit the shift cannot lower it, and
+a free string's reduction time is the time the shift takes to carry it once around a largest ring,
+`Lt_c` (`hClock`).  The horizon's period is the same lap (`I1`), so a string's energy is the
+horizon's thermal energy, `ε_s = k_BT_dS`. -/
+theorem string_energy (τred εs T : ℝ) (hDP : εs = R.ℏ / τred) (hClock : τred = R.L * R.tc)
+    (I1 : R.kB * T = R.ℏ / (R.L * R.tc)) : εs = R.kB * T := by
+  rw [hDP, hClock, I1]
+
+/-- **The split of a string's energy** (Sec. II).  With a string's energy one horizon thermal
+energy, `ε_s = k_BT_dS` (`hεs`, derived by `string_energy` from Palmer's relation), its heat, the
+horizon's temperature times the string's one bit of entropy, is `ln 2` of it and equals the
+vacuum's share per string (`vacuum_per_string`), and the rest, `(1 − ln 2)ε_s`, is matter. -/
 theorem string_split (G Λ T εs : ℝ) (hJ : G = R.c ^ 3 * R.kB / (4 * R.ℏ * R.η))
     (hdS : R.fSdS G 0 Λ R.RL = 0) (I1 : R.kB * T = R.ℏ / (R.L * R.tc)) (hεs : εs = R.kB * T) :
     R.ln2 * εs = R.c ^ 4 * R.RL / (2 * G) / R.Rhor ∧

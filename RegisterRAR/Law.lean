@@ -3,41 +3,52 @@ import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 /-!
-# Secs. III–VIII of the paper: the share, the tolerance, the law, and the scale at every epoch
+# Secs. III–IX of the paper: the share, the threshold, the law, two bodies, and the scale at every epoch
 
-Formal counterpart of Secs. III–VIII of *The Radial Acceleration Relation from the Granularity of
-Hilbert Space* (v0-13).  As in `Chain.lean`, each physical input is a named hypothesis of the
+Formal counterpart of Secs. III–IX of *The Radial Acceleration Relation from the Granularity of
+Hilbert Space* (v0-18).  As in `Chain.lean`, each physical input is a named hypothesis of the
 theorems that use it, and nothing is declared as an axiom.
 
 * `Law.share_of_equipartition` (Sec. III): by Postulate 1 a body's energy is held by strings, a
-  string that carries nothing of the body holds none of it, and equipartition gives each string
-  that carries it the same share; so the energy is the number of carriers times that share.
+  string that does not carry the body's information holds none of the body's energy, and
+  equipartition gives each string that carries it the same share; so the energy is the number of
+  carriers times that share.
 * `Reg.share_acceleration`, Eq. (4): with the body's energy held by the fraction `b` of the
   sphere's strings at two Landauer energies each, against Eq. (3) at `g_N`, the acceleration is
   `g_N/b`.
 * `Reg.fill_fraction`, Eqs. (5)–(7): the body's energy per string, two Landauer energies at the
   Unruh temperature of `g_N`, counted in units of a string's matter `u = (1 − ln 2)k_BT_dS`, is
   `f = g_N/a₀` with `a₀ = (1 − ln 2)c²/(2 ln 2 R_Λ)`.
-* `Reg.law`, Eq. (10): with the tolerance exponential with mean one in amplitude (`hME`, maximum
+* `Reg.law`, Eq. (10): with the threshold exponential with mean one in amplitude (`hME`, maximum
   entropy with one qubit as the only scale), the fraction of carriers is `b = 1 − e^{−√f}`, and
   `a = g_N/(1 − e^{−√(g_N/a₀)})`.
-* `Reg.law_scale_mean` (Sec. VII): a tolerance of mean `μ` would give the scale `μ²a₀`.
-* `Law.classical_limit` (Sec. VII): a classical share, the probability `b = f` in place of the
+* `Reg.law_scale_mean` (Sec. VIII): a threshold of mean `μ` would give the scale `μ²a₀`.
+* `Law.classical_limit` (Sec. VIII): a classical share, the probability `b = f` in place of the
   amplitude, would give `a = a₀` and rotation speeds rising as `√r`; flat rotation curves
   therefore support Postulate 1.
-* `Reg.scale_over_time`, Eq. (14) (Sec. VIII): with Jacobson's `G`, `a₀` is a fixed fraction of the
+* `Reg.scale_over_time`, Eq. (16) (Sec. IX): with Jacobson's `G`, `a₀` is a fixed fraction of the
   Planck acceleration `√(c⁷/ℏG)` and `Λ = 12πc³/(L²ℏG ln 2)`; the same formula with another `G'`
   gives twice the scale only if `G' = G/4`.
 * `Law.near_limit` (Sec. VI), `Law.deep_limit` and `Law.tully_fisher`, Eqs. (11)–(12): near
   the body `a = g_N(1 + e^{−h}) + g_N e^{−2h}/(1 − e^{−h})`, so Newton's law returns
   exponentially; far from it `a` lies within `a₀h³` of `√(a₀g_N) + g_N/2` for `h ≤ 1/2`; and on
   a circular orbit in the deep regime `v⁴ = a₀GM`.
+* `Reg.share_reading`, `Law.two_body_split`, `Law.two_body_deep`, `Law.two_body_equal`
+  (Sec. VII): on a sphere the body's share at a string, `Mc²/N_s`, equals the carrier
+  fraction times what a carrier holds, `b·2k_BT_a ln 2`, so Eq. (10) is unchanged when the
+  share is read from the acceleration at the patch, the reading that conserves momentum
+  between two bodies; momentum conservation (`hmom`, Postulate 1) splits the force between two
+  bodies as `F/M₁` and `F/M₂`; and Milgrom's virial theorem for the deep regime (`hvir`),
+  Eq. (14), gives a force whose test-body limit is Eq. (11) and whose equal-mass value is
+  `(4/3)(√2 − 1) M√(GMa₀)/r`.  The field equation and the virial theorem are vector calculus
+  and enter as `hvir`; Lean checks what follows from them.
 
 The amplitude `h = √f` follows from Postulate 1 with Palmer's rule (Sec. II): a string that
-carries the body is one of its qubits, so its share of the body is the fraction `f` of a whole
-qubit, and the amplitude of that share is `√f`, in units of one whole qubit.  It enters through
-the argument of `hME`.  The fraction `b` of carriers is the probability that a string's
-tolerance lies below `h`, and so the fraction of the sphere's strings that carry the body.
+carries the body's information is one of its qubits, so its share of the body is the fraction `f`
+of a whole qubit, and the amplitude of that share is `√f`, in units of one whole qubit.  It
+enters through the argument of `hME`.  The fraction `b` of carriers is the probability that the
+threshold of a string's receiving cell lies below `h`, and so the fraction of the sphere's
+strings that carry the body's information.
 -/
 
 open Real Finset
@@ -46,10 +57,12 @@ namespace Register
 
 namespace Law
 
-/-- **The share of a body's energy** (Sec. III), in finite form.  The body's energy `E` is held by
-the strings `S` of the sphere (`hsum`; by Postulate 1 all the mass and light of the universe
-consists of strings); a string that does not carry the body keeps the state it has without the body
-and holds none of its energy (`hoff`); and equipartition gives each carrier the same share `ε`
+/-- **The share of a body's energy** (Sec. III), in finite form.  The body is all the mass inside
+the sphere, so a string's share is of that total, not of each star within it.  The body's energy
+`E` is held by the strings `S` of the sphere (`hsum`; by Postulate 1 all the mass and light of the
+universe consists of strings); where a string does not carry the body's information, its
+receiving cell keeps the state it has without the body, and the string holds none of the body's
+Landauer energies there (`hoff`); and equipartition gives each carrier the same share `ε`
 (`heq`).  Then `E = |C| ε`: the energy is held by the carriers alone. -/
 theorem share_of_equipartition {ι : Type*} (S C : Finset ι) (hCS : C ⊆ S) (e : ι → ℝ) (E ε : ℝ)
     (hsum : ∑ i ∈ S, e i = E) (hoff : ∀ i ∈ S, i ∉ C → e i = 0) (heq : ∀ i ∈ C, e i = ε) :
@@ -126,10 +139,22 @@ theorem share_acceleration (M Ns b TN Ta gN a : ℝ) (hNs : 0 < Ns) (hb : 0 < b)
     exact e
   rw [key, mul_comm b a, mul_div_assoc, div_self hb.ne', mul_one]
 
+/-- **The two readings of a string's share** (Sec. VII).  Sec. IV reads the body's share at a
+string of the sphere as the body's energy per string, `E = Mc²/N_s`.  Eq. (4), `hS`, reads it as
+the carrier fraction times what a carrier holds, two Landauer energies at the sphere's
+temperature.  On a sphere the two are the same number, so Eq. (10) is unchanged by the second
+reading.  Between two bodies the temperature varies over a surface, and only the second reading
+conserves momentum (Sec. VII). -/
+theorem share_reading (M Ns b Ta : ℝ) (hNs : Ns ≠ 0)
+    (hS : M * R.c ^ 2 = 2 * (b * Ns) * (R.kB * Ta * R.ln2)) :
+    M * R.c ^ 2 / Ns = b * (2 * R.kB * Ta * R.ln2) := by
+  rw [hS, div_eq_iff hNs]
+  ring
+
 /-- **What reaches a string**, Eqs. (5)–(7).  The body's energy per string, two Landauer energies at
 the Unruh temperature `T_N` of `g_N` (`I1N`), counted in units of a string's matter
-`u = (1 − ln 2)ε_s`, with a string's energy `ε_s = k_BT_dS` (`hεs`) and the Gibbons–Hawking
-temperature (`I1dS`), is `f = g_N/a₀`. -/
+`u = (1 − ln 2)ε_s`, with a string's energy `ε_s = k_BT_dS` (`hεs`, from `string_energy`) and
+the Gibbons–Hawking temperature (`I1dS`), is `f = g_N/a₀`. -/
 theorem fill_fraction (gN TN TdS εs : ℝ) (hgN : 0 < gN)
     (I1N : R.kB * TN = R.ℏ / (R.La gN * R.tc)) (I1dS : R.kB * TdS = R.ℏ / (R.L * R.tc))
     (hεs : εs = R.kB * TdS) :
@@ -144,8 +169,8 @@ theorem fill_fraction (gN TN TdS εs : ℝ) (hgN : 0 < gN)
   unfold a0
   field_simp
 
-/-- **The law**, Eq. (10).  The tolerance's survival function is `e^{−x}` (`hME`: maximum entropy
-for a positive quantity whose only scale, one qubit, is its mean), so the strings whose tolerance
+/-- **The law**, Eq. (10).  The threshold's survival function is `e^{−x}` (`hME`: maximum entropy
+for a positive quantity whose only scale, one qubit, is its mean), so the strings whose threshold
 lies below the amplitude `√(g_N/a₀)` are the fraction `b = 1 − e^{−√(g_N/a₀)}` (`hb`), and with
 `a = g_N/b` (`share_acceleration`) the relation follows. -/
 theorem law (gN a b : ℝ) (surv : ℝ → ℝ) (hME : ∀ x, 0 ≤ x → surv x = Real.exp (-x))
@@ -153,9 +178,9 @@ theorem law (gN a b : ℝ) (surv : ℝ → ℝ) (hME : ∀ x, 0 ≤ x → surv x
     a = gN / (1 - Real.exp (-Real.sqrt (gN / R.a0))) := by
   rw [hab, hb, hME _ (Real.sqrt_nonneg _)]
 
-/-- **The scale goes as the square of the tolerance's mean** (Sec. VII).  Were the tolerance
+/-- **The scale goes as the square of the threshold's mean** (Sec. VIII).  Were the threshold
 exponential with mean `μ` instead of one qubit (`hME`), the law would keep its form with the scale
-`μ²a₀`; so the measured scale fixes `μ` (`Numerics.tolerance_mean_from_data`). -/
+`μ²a₀`; so the measured scale fixes `μ` (`Numerics.threshold_mean_from_data`). -/
 theorem law_scale_mean (gN a b μ : ℝ) (hμ : 0 < μ) (surv : ℝ → ℝ)
     (hME : ∀ x, 0 ≤ x → surv x = Real.exp (-x / μ))
     (hb : b = 1 - surv (Real.sqrt (gN / R.a0))) (hab : a = gN / b) :
@@ -165,11 +190,11 @@ theorem law_scale_mean (gN a b μ : ℝ) (hμ : 0 < μ) (surv : ℝ → ℝ)
       Real.sqrt_div' _ (sq_nonneg μ), Real.sqrt_sq hμ.le]
   rw [hab, hb, hME _ (Real.sqrt_nonneg _), hs, neg_div]
 
-/-- **The scale and `Λ` at every epoch** (Sec. VIII, Eq. (14)).  With Jacobson's `G` (`hJ`, which
+/-- **The scale and `Λ` at every epoch** (Sec. IX, Eq. (16)).  With Jacobson's `G` (`hJ`, which
 gives `G = c³ℓ_c²/(πℏ ln 2)`, `Reg.G_eq`) and `Λ = 3/R_Λ²` (`hΛ`), the scale is a fixed fraction of
 the Planck acceleration, `a₀ = (1 − ln 2)√π/((ln 2)^{3/2} L) · √(c⁷/ℏG)`, and
 `Λ = 12πc³/(L²ℏG ln 2)`.  The same formula with another value `G'` of Newton's constant gives twice
-the scale only if `G' = G/4`.  Lean has no epochs: Sec. VIII applies the formula at every epoch
+the scale only if `G' = G/4`.  Lean has no epochs: Sec. IX applies the formula at every epoch
 with that epoch's `G`, since `L` and the split of a string's energy do not change and our units
 fix `c` and `ℏ`. -/
 theorem scale_over_time (G Λ : ℝ) (hJ : G = R.c ^ 3 * R.kB / (4 * R.ℏ * R.η))
@@ -289,7 +314,7 @@ theorem deep_limit (a0 h : ℝ) (ha0 : 0 < a0) (hh : 0 < h) (hh2 : h ≤ 1 / 2) 
       _ ≤ (a0 * h + a0 * h ^ 2 / 2 + a0 * h ^ 3) * (1 - Real.exp (-h)) :=
           mul_le_mul_of_nonneg_left (by linarith) (by positivity)
 
-/-- **A classical share** (Sec. VII).  If a string's share of the body were classical, the string
+/-- **A classical share** (Sec. VIII).  If a string's share of the body were classical, the string
 would hold a record of the body with the probability `f = g_N/a₀` (`hb`), in place of the
 amplitude.  Far from the body, where `f ≤ 1`, the carriers would be the fraction `b = f`, and
 `a = g_N/b = a₀`.  On a circular orbit `v² = ar = a₀r`, so rotation speeds would rise as `√r`.
@@ -309,6 +334,112 @@ theorem tully_fisher (a0 G M r v : ℝ) (ha0 : 0 < a0) (hG : 0 < G) (hM : 0 < M)
   have e : v ^ 4 = (v ^ 2) ^ 2 := by ring
   rw [e, hv, mul_pow, Real.sq_sqrt (by positivity), mul_assoc,
     div_mul_cancel₀ _ (pow_ne_zero 2 hr')]
+  ring
+
+/-! ### Two bodies (Sec. VII) -/
+
+/-- **Two bodies: the split** (Sec. VII).  Momentum is conserved (`hmom`; by Postulate 1 no law
+depends on the global phase, so every law commutes with the shift of a ring, whose generator is
+the momentum along it), so two bodies pull each other equally, with the force `F = M₁a₁` (`hF`).
+Each body then accelerates at `F/M_i`, and the relative acceleration is `F(M₁ + M₂)/M₁M₂`. -/
+theorem two_body_split (M₁ M₂ a₁ a₂ F : ℝ) (h₁ : 0 < M₁) (h₂ : 0 < M₂)
+    (hmom : M₁ * a₁ = M₂ * a₂) (hF : F = M₁ * a₁) :
+    a₁ = F / M₁ ∧ a₂ = F / M₂ ∧ a₁ + a₂ = F * (M₁ + M₂) / (M₁ * M₂) := by
+  refine ⟨?_, ?_, ?_⟩
+  · rw [hF, eq_div_iff h₁.ne']
+    ring
+  · rw [hF, hmom, eq_div_iff h₂.ne']
+    ring
+  · rw [hF, eq_div_iff (mul_pos h₁ h₂).ne']
+    linear_combination (-M₁ : ℝ) * hmom
+
+/-- The algebra behind `two_body_deep`, with `u = √M₁`, `v = √(M₁ + M₂)`, `w = √M₂` and
+`s = √(Ga₀)`: the bounds on `F/M₂` reduce to `(v − u)²(2v + u) ≥ 0` and
+`(v − u)²(v + 2u) + 2w³ ≥ 0`. -/
+lemma two_body_bounds (s u v w r : ℝ) (hs : 0 < s) (hr : 0 < r) (hu : 0 ≤ u) (hw : 0 < w)
+    (huv : u ≤ v) (hw2 : w * w = v * v - u * u) :
+    s * u / r - 2 / 3 * s * w / r ≤
+      2 / 3 * s * (v * v * v - u * u * u - w * w * w) / r / (w * w) ∧
+    2 / 3 * s * (v * v * v - u * u * u - w * w * w) / r / (w * w) ≤ s * v / r := by
+  have hv : 0 ≤ v := le_trans hu huv
+  have hw2' : 0 < w * w := mul_pos hw hw
+  have hr' := hr.ne'
+  have hw' := hw.ne'
+  have h1 : 0 ≤ s * ((v - u) ^ 2 * (2 * v + u)) :=
+    mul_nonneg hs.le (mul_nonneg (sq_nonneg _) (by linarith))
+  have h2 : 0 ≤ s * ((v - u) ^ 2 * (v + 2 * u)) :=
+    mul_nonneg hs.le (mul_nonneg (sq_nonneg _) (by linarith))
+  have h3 : 0 ≤ s * (w * (v * v - u * u)) := by
+    rw [← hw2]; positivity
+  constructor
+  · rw [div_div, le_div_iff₀ (mul_pos hr hw2')]
+    have e : (s * u / r - 2 / 3 * s * w / r) * (r * (w * w)) =
+        s * u * (w * w) - 2 / 3 * s * w * (w * w) := by
+      field_simp
+    rw [e, hw2]
+    nlinarith [h1]
+  · rw [div_div, div_le_iff₀ (mul_pos hr hw2')]
+    have e : s * v / r * (r * (w * w)) = s * v * (w * w) := by
+      field_simp
+    rw [e, hw2]
+    nlinarith [h2, h3]
+
+/-- **Two bodies in the deep regime** (Sec. VII).  With the carrier fraction at a patch set by the
+acceleration there (`Reg.share_reading`), the field equation `∇·(b∇Φ) = 4πGρ` is Bekenstein and
+Milgrom's, which comes from an action and conserves momentum.  In the deep regime, where the law
+is `a = √(a₀g_N)`, Milgrom's virial theorem gives the force between two bodies `M₁` and `M₂` at a
+distance `r` (`hvir`): `rF = (2/3)√(Ga₀)[(M₁ + M₂)^{3/2} − M₁^{3/2} − M₂^{3/2}]`, Eq. (14).  Then
+`F/M₂`, the acceleration of `M₂`, lies between `√(GM₁a₀)/r − (2/3)√(Ga₀M₂)/r` and
+`√(G(M₁ + M₂)a₀)/r`, so it tends to a test body's `√(GM₁a₀)/r`, Eq. (11), as `M₂ → 0`. -/
+theorem two_body_deep (G a0 M₁ M₂ r F : ℝ) (hG : 0 < G) (ha0 : 0 < a0) (h₁ : 0 < M₁)
+    (h₂ : 0 < M₂) (hr : 0 < r)
+    (hvir : r * F = 2 / 3 * Real.sqrt (G * a0) *
+      ((M₁ + M₂) * Real.sqrt (M₁ + M₂) - M₁ * Real.sqrt M₁ - M₂ * Real.sqrt M₂)) :
+    Real.sqrt (G * M₁ * a0) / r - 2 / 3 * Real.sqrt (G * a0 * M₂) / r ≤ F / M₂ ∧
+    F / M₂ ≤ Real.sqrt (G * (M₁ + M₂) * a0) / r := by
+  have hGa : 0 ≤ G * a0 := (mul_pos hG ha0).le
+  have hs : 0 < Real.sqrt (G * a0) := Real.sqrt_pos.mpr (mul_pos hG ha0)
+  have hu : 0 ≤ Real.sqrt M₁ := Real.sqrt_nonneg _
+  have hw : 0 < Real.sqrt M₂ := Real.sqrt_pos.mpr h₂
+  have huv : Real.sqrt M₁ ≤ Real.sqrt (M₁ + M₂) := Real.sqrt_le_sqrt (by linarith)
+  have huu : Real.sqrt M₁ * Real.sqrt M₁ = M₁ := Real.mul_self_sqrt h₁.le
+  have hvv : Real.sqrt (M₁ + M₂) * Real.sqrt (M₁ + M₂) = M₁ + M₂ :=
+    Real.mul_self_sqrt (add_pos h₁ h₂).le
+  have hww : Real.sqrt M₂ * Real.sqrt M₂ = M₂ := Real.mul_self_sqrt h₂.le
+  have hw2 : Real.sqrt M₂ * Real.sqrt M₂ =
+      Real.sqrt (M₁ + M₂) * Real.sqrt (M₁ + M₂) - Real.sqrt M₁ * Real.sqrt M₁ := by
+    rw [hww, hvv, huu]; ring
+  have e1 : Real.sqrt (G * M₁ * a0) = Real.sqrt (G * a0) * Real.sqrt M₁ := by
+    rw [← Real.sqrt_mul hGa]; congr 1; ring
+  have e2 : 2 / 3 * Real.sqrt (G * a0 * M₂) / r = 2 / 3 * Real.sqrt (G * a0) * Real.sqrt M₂ / r := by
+    rw [Real.sqrt_mul hGa]; ring
+  have e3 : Real.sqrt (G * (M₁ + M₂) * a0) = Real.sqrt (G * a0) * Real.sqrt (M₁ + M₂) := by
+    rw [← Real.sqrt_mul hGa]; congr 1; ring
+  have hF : F / M₂ = 2 / 3 * Real.sqrt (G * a0) *
+      (Real.sqrt (M₁ + M₂) * Real.sqrt (M₁ + M₂) * Real.sqrt (M₁ + M₂) -
+        Real.sqrt M₁ * Real.sqrt M₁ * Real.sqrt M₁ - Real.sqrt M₂ * Real.sqrt M₂ * Real.sqrt M₂) /
+      r / (Real.sqrt M₂ * Real.sqrt M₂) := by
+    rw [hww, hvv, huu]
+    have : F = 2 / 3 * Real.sqrt (G * a0) *
+        ((M₁ + M₂) * Real.sqrt (M₁ + M₂) - M₁ * Real.sqrt M₁ - M₂ * Real.sqrt M₂) / r := by
+      rw [eq_div_iff hr.ne', mul_comm F r, hvir]
+    rw [this]
+  rw [e1, e2, e3, hF]
+  exact two_body_bounds (Real.sqrt (G * a0)) (Real.sqrt M₁) (Real.sqrt (M₁ + M₂)) (Real.sqrt M₂)
+    r hs hr hu hw huv hw2
+
+/-- **Two equal bodies in the deep regime** (Sec. VII): with `M₁ = M₂ = M`, Eq. (14) gives
+`F = (4/3)(√2 − 1) M√(GMa₀)/r`. -/
+theorem two_body_equal (G a0 M r F : ℝ) (hG : 0 < G) (ha0 : 0 < a0) (hr : 0 < r)
+    (hvir : r * F = 2 / 3 * Real.sqrt (G * a0) *
+      ((M + M) * Real.sqrt (M + M) - M * Real.sqrt M - M * Real.sqrt M)) :
+    F = 4 / 3 * (Real.sqrt 2 - 1) * M * Real.sqrt (G * M * a0) / r := by
+  have hGa : 0 ≤ G * a0 := (mul_pos hG ha0).le
+  have e1 : Real.sqrt (M + M) = Real.sqrt 2 * Real.sqrt M := by
+    rw [← Real.sqrt_mul (by norm_num)]; congr 1; ring
+  have e2 : Real.sqrt (G * M * a0) = Real.sqrt (G * a0) * Real.sqrt M := by
+    rw [← Real.sqrt_mul hGa]; congr 1; ring
+  rw [eq_div_iff hr.ne', mul_comm F r, hvir, e1, e2]
   ring
 
 end Law

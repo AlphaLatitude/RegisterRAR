@@ -6,14 +6,14 @@ import Mathlib.Topology.Order.IntermediateValue
 # The de Sitter horizon: a quarter of a largest ring away, with a largest ring's lap as its period
 
 Two properties of the solution without a mass that Sec. II of *The Radial Acceleration Relation
-from the Granularity of Hilbert Space* (v0-13) uses, derived from it.  Both are copied
+from the Granularity of Hilbert Space* (v0-18) uses, derived from it.  Both are copied
 unchanged from RegisterGravity v11.2 (`DeSitter.lean`), with the surface gravity `a_Λ` defined
 here.
 
 * `proper_distance`: with the horizon at `R_Λ` (`Chain.radius_from_geodesics`), the proper distance
   from the observer along a radial line, the function `s` with `s(0) = 0` and `ds/dr = 1/√f`,
   reaches the horizon at `s(R_Λ) = πR_Λ/2 = Lℓ_c/4`, a quarter of a largest ring.  This is the
-  distance `L/4` of the horizon in `Distances.horizon_weight_ring`.
+  distance `L/4` of the horizon in `Positions.horizon_weight_ring`.
 * `horizon_period`, `horizon_temperature`: the field of the solution at the horizon is
   `−c²/R_Λ`, so the horizon's surface gravity is `a_Λ = c²/R_Λ`; its thermal period `2πc/a_Λ` is a
   largest ring's lap `Lt_c`; and with `I1` its temperature is the Gibbons–Hawking one,

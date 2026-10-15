@@ -7,7 +7,7 @@ import Mathlib.Tactic.GCongr
 /-!
 # The numbers of the paper, certified
 
-Every number that *The Radial Acceleration Relation from the Granularity of Hilbert Space* (v0-13)
+Every number that *The Radial Acceleration Relation from the Granularity of Hilbert Space* (v0-18)
 computes from its inputs, recomputed from the inputs of Appendix A and certified by an interval:
 each theorem states `lo < quantity < hi`, and every number in the interval rounds to the value the
 paper quotes.  Observational values and their uncertainties are inputs, not claims.
@@ -19,7 +19,7 @@ paper quotes.  Observational values and their uncertainties are inputs, not clai
 `Ω_Λ = 0.685`, the heliocentric constant `GM☉ = 1.32712440018e20 m³/s²`, `1 au = 149597870700 m`,
 `1 kpc = 3.0856775814913673e19 m`; for comparison, `a₀ = 1.20 ± 0.02 ± 0.24` [McGaugh 2016] and
 `1.19 ± 0.04 ± 0.09` [Desmond 2023], in `10⁻¹⁰ m/s²`, `H₀ ± 0.5` and `Ω_Λ ± 0.007` [Planck 2018],
-and the local `H₀ = 73`.
+the local `H₀ = 73`, and DESI's `Ω_Λ = 0.7025 ± 0.0086` [DESI DR2 2025].
 
 ## `π`, `ln 2` and `e`
 
@@ -113,14 +113,14 @@ theorem a0_tight : 1.1996372e-10 < a0v ∧ a0v < 1.199638e-10 := by
 
 lemma a0v_pos : 0 < a0v := by have := a0_tight.1; linarith
 
-/-- **The scale**, Eq. (13), Table I and Appendix A: `a₀ = 1.1996×10⁻¹⁰ m/s²`, `1.200` to the
+/-- **The scale**, Eq. (15), Table I and Appendix A: `a₀ = 1.1996×10⁻¹⁰ m/s²`, `1.200` to the
 precision quoted. -/
 theorem a0_val : (1.19963e-10 < a0v ∧ a0v < 1.19964e-10) ∧ (1.1995e-10 < a0v ∧ a0v < 1.2005e-10) := by
   obtain ⟨h1, h2⟩ := a0_tight
   exact ⟨⟨by linarith, by linarith⟩, ⟨by linarith, by linarith⟩⟩
 
 /-- **The coefficient**, Appendix A: `(1 − ln 2)/2 ln 2 = 0.22135`; to four places it is `0.2213`,
-so `a₀ = 0.2213 c²/R_Λ` in Eq. (13). -/
+so `a₀ = 0.2213 c²/R_Λ` in Eq. (15). -/
 theorem coefficient : 0.221345 < κ ∧ κ < 0.221355 := by
   obtain ⟨k1, k2⟩ := κ_tight
   exact ⟨by linarith, by linarith⟩
@@ -198,7 +198,21 @@ theorem string_energy_check :
   · rw [lt_div_iff₀ (by norm_num)]; linarith
   · rw [div_lt_iff₀ (by norm_num)]; linarith
 
-/-! ## Against observation (Sec. VII) -/
+/-- **The predicted vacuum share against the measurements** (Table I, Sec. II, Appendix A): the
+share `ln 2 = 0.6931` lies `1.2σ` above Planck's `Ω_Λ = 0.685 ± 0.007` and `1.1σ` below DESI's
+`0.7025 ± 0.0086` from baryon acoustic oscillations alone. -/
+theorem vacuum_share :
+    (0.69305 < Real.log 2 ∧ Real.log 2 < 0.69315) ∧
+    (1.15 < (Real.log 2 - 0.685) / 0.007 ∧ (Real.log 2 - 0.685) / 0.007 < 1.25) ∧
+    (-1.15 < (Real.log 2 - 0.7025) / 0.0086 ∧ (Real.log 2 - 0.7025) / 0.0086 < -1.05) := by
+  have l1 := Real.log_two_gt_d9; have l2 := Real.log_two_lt_d9
+  refine ⟨⟨by linarith, by linarith⟩, ⟨?_, ?_⟩, ⟨?_, ?_⟩⟩
+  · rw [lt_div_iff₀ (by norm_num)]; linarith
+  · rw [div_lt_iff₀ (by norm_num)]; linarith
+  · rw [lt_div_iff₀ (by norm_num)]; linarith
+  · rw [div_lt_iff₀ (by norm_num)]; linarith
+
+/-! ## Against observation (Sec. VIII) -/
 
 /-- the relative uncertainty of `a₀` from Planck's `H₀ ± 0.5` and `Ω_Λ ± 0.007`, in quadrature -/
 noncomputable def relErr : ℝ :=
@@ -226,7 +240,7 @@ lemma SD_tight : 9.848e-12 < SD ∧ SD < 9.849e-12 := by
   · rw [Real.lt_sqrt (by norm_num)]; norm_num
   · rw [Real.sqrt_lt' (by norm_num)]; norm_num
 
-/-- **The uncertainty of the scale** (Sec. VII, Appendix A): `±0.011×10⁻¹⁰ m/s²`, a relative
+/-- **The uncertainty of the scale** (Sec. VIII, Appendix A): `±0.011×10⁻¹⁰ m/s²`, a relative
 `0.9%`. -/
 theorem a0_uncertainty :
     (0.0085 < relErr ∧ relErr < 0.0095) ∧
@@ -240,7 +254,7 @@ theorem a0_uncertainty :
           mul_lt_mul'' a2 r2 (by linarith) (by linarith)
       _ < (1.15e-12 : ℝ) := by norm_num
 
-/-- **Against the measurements** (Sec. VII, Table I): the derived `a₀` lies `0.0σ` from McGaugh's
+/-- **Against the measurements** (Sec. VIII, Table I): the derived `a₀` lies `0.0σ` from McGaugh's
 `1.20` and `0.1σ` from Desmond's `1.19`, counting the systematic errors. -/
 theorem a0_sigmas :
     (-0.05 < (a0v - 1.20e-10) / SM ∧ (a0v - 1.20e-10) / SM < 0.05) ∧
@@ -256,7 +270,7 @@ theorem a0_sigmas :
   · rw [lt_div_iff₀ hD]; linarith
   · rw [div_lt_iff₀ hD]; linarith
 
-/-- **With the local `H₀ = 73`** (Sec. VII): `a₀ = 1.30×10⁻¹⁰ m/s²`, `0.4σ` and `1.1σ` from the
+/-- **With the local `H₀ = 73`** (Sec. VIII): `a₀ = 1.30×10⁻¹⁰ m/s²`, `0.4σ` and `1.1σ` from the
 measurements. -/
 theorem a0_local_H0 :
     (1.295e-10 < a0v * 73 / 67.4 ∧ a0v * 73 / 67.4 < 1.305e-10) ∧
@@ -275,10 +289,10 @@ theorem a0_local_H0 :
   · rw [lt_div_iff₀ hD]; linarith
   · rw [div_lt_iff₀ hD]; linarith
 
-/-- **The tolerance's mean, read from the data** (Sec. VII): the scale goes as the square of the
+/-- **The threshold's mean, read from the data** (Sec. VIII): the scale goes as the square of the
 mean, so McGaugh's `a₀` puts the mean at `√(1.20/a₀) = 1.00`, with the spread `0.24/(2 × 1.20) =
 0.10`. -/
-theorem tolerance_mean_from_data :
+theorem threshold_mean_from_data :
     (0.995 < Real.sqrt (1.20e-10 / a0v) ∧ Real.sqrt (1.20e-10 / a0v) < 1.005) ∧
     (0.095 < SM / (2 * 1.20e-10) ∧ SM / (2 * 1.20e-10) < 0.105) := by
   obtain ⟨a1, a2⟩ := a0_tight
@@ -290,9 +304,9 @@ theorem tolerance_mean_from_data :
   · rw [lt_div_iff₀ (by norm_num)]; linarith
   · rw [div_lt_iff₀ (by norm_num)]; linarith
 
-/-! ## The coefficients of Sec. VIII and Table II -/
+/-! ## The coefficients of Sec. IX and Table II -/
 
-/-- **In units of `cH₀`** (Sec. VIII, Appendix A): `cH₀ = 6.548×10⁻¹⁰ m/s²`; the derived scale is
+/-- **In units of `cH₀`** (Sec. IX, Appendix A): `cH₀ = 6.548×10⁻¹⁰ m/s²`; the derived scale is
 `0.1832 cH₀` (`0.183`), the measured `1.20×10⁻¹⁰` is `0.1833 cH₀`; `cH₀/6 = 1.091×10⁻¹⁰` (`1/6 =
 0.167`) and `cH₀/2π = 1.042×10⁻¹⁰` (`1/2π = 0.159`). -/
 theorem cH0_coefficients :
